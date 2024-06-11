@@ -102,7 +102,7 @@ const submit = async () => {
     </div>
     <MainSection class="main">
       <form>
-        <FormInput label="Nama" placeholder="contoh: Ahmad" v-model="name" />
+        <FormInput label="Nama" placeholder="contoh: Ahmad" v-model="name" input-type="password" />
         <FormInput label="Alamat" placeholder="contoh: Jl Jalak 3" v-model="address" />
         <FormInput label="No Telp" placeholder="contoh: 0800000000" v-model="phone" />
         <FormSelect label="Pilih Jenis Kelamin" placeholder="--Pilih Jenis Kelamin--" :data="genderOptions" :on-change="(e) => setSelectedGender(e)" />

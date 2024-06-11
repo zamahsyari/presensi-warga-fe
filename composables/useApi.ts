@@ -5,7 +5,7 @@ export type GetMajlisResponse = {
 }
 
 export type PostLoginResponse = {
-  id: string
+  id: number
   username: string
   name: string
   token: string
@@ -92,6 +92,12 @@ export type GetGelombangResponse = {
   data: Gelombang[],
 }
 
+export type ChangePasswordRequest = {
+  user_id: number
+  user_name: string
+  user_password: string
+}
+
 const useApi = (baseURL:string, token:string) => {
   const postLogin = async (username:string, password:string):Promise<PostLoginResponse> => {
     const url = `${baseURL}/auth/login`
@@ -158,7 +164,7 @@ const useApi = (baseURL:string, token:string) => {
 
   const getGelombang = async (officeId:number):Promise<Gelombang[]> => {
     const maxInt = Number.MAX_SAFE_INTEGER
-    const url = `${baseURL}/session?per_page=${maxInt}&filter[]=offices_id:${officeId}`
+    const url = `${baseURL}/session?per_page=${maxInt}&filter=offices_id:${officeId}`
     const {data, status} = await axios.get<GetGelombangResponse>(url, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -179,16 +185,16 @@ const useApi = (baseURL:string, token:string) => {
     const maxInt = Number.MAX_SAFE_INTEGER
     let url = ''
     if (officeId != 0) {
-      url = `${baseURL}/events?per_page=${maxInt}&page=1&filter[]=name:${q}`
+      url = `${baseURL}/events?per_page=${maxInt}&page=1&filter=name:${q}`
     } else {
-      url = `${baseURL}/events?per_page=${maxInt}&page=1&filter[]=name:${q}&filter[]=office_id:${officeId}`
+      url = `${baseURL}/events?per_page=${maxInt}&page=1&filter=name:${q},office_id:${officeId}`
     }
     const now = new Date()
     const dateNow = `${formatDecimal(now.getFullYear())}-${formatDecimal(now.getMonth() + 1)}-${formatDecimal(now.getDate())}`
     const nextWeek = new Date()
     nextWeek.setDate(now.getDate() + 7)
     const dateNextWeek = `${formatDecimal(nextWeek.getFullYear())}-${formatDecimal(nextWeek.getMonth() + 1)}-${formatDecimal(nextWeek.getDate())}`
-    url = `${url}&filter[]=from:${dateNow}&filter[]=to:${dateNextWeek}&filter[]=name:${q}&sort=updated_at:-1`
+    url = `${url},from:${dateNow},to:${dateNextWeek},name:${q}&sort=updated_at:-1`
     const {data, status} = await axios.get<GetEventResponse>(url, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -197,6 +203,7 @@ const useApi = (baseURL:string, token:string) => {
     if (status !== 200) {
       return Promise.reject('ERROR')
     }
+    console.log('datanya', data)
     return Promise.resolve(data.data)
   }
 
@@ -228,7 +235,7 @@ const useApi = (baseURL:string, token:string) => {
 
   const getPresences = async (eventId:number):Promise<Presence[]> => {
     const maxInt = Number.MAX_SAFE_INTEGER
-    const url = `${baseURL}/presences?filter[]=event_id:${eventId}&per_page=${maxInt}&page=1`
+    const url = `${baseURL}/presences?filter=event_id:${eventId}&per_page=${maxInt}&page=1`
     const {data, status} = await axios.get<GetPresenceResponse>(url, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -295,7 +302,7 @@ const useApi = (baseURL:string, token:string) => {
 
   const getWargaCabang = async (idCabang:number, q?:string):Promise<Warga[]> => {
     const maxInt = Number.MAX_SAFE_INTEGER
-    const url = `${baseURL}/warga?filter[]=office_id:${idCabang}&filter[]=member_name:${q ? q : ''}&per_page=${maxInt}&page=1`
+    const url = `${baseURL}/warga?filter=office_id:${idCabang},member_name:${q ? q : ''}&per_page=${maxInt}&page=1`
     const {data, status} = await axios.get<GetWargaResponse>(url, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -305,6 +312,32 @@ const useApi = (baseURL:string, token:string) => {
       return Promise.reject('ERROR')
     }
     return Promise.resolve(data.data)
+  }
+
+  const putNewAdminPassword = async (id:number, payload:ChangePasswordRequest):Promise<void> => {
+    const url = `${baseURL}/users/password/${id}`
+    const {data, status} = await axios.put(url, payload, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    if (status !== 200) {
+      return Promise.reject('ERROR')
+    }
+    return Promise.resolve()
+  }
+
+  const putNewOfficePassword = async (id:number, payload:ChangePasswordRequest):Promise<void> => {
+    const url = `${baseURL}/users/office-password/${id}`
+    const {data, status} = await axios.put(url, payload, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    if (status !== 200) {
+      return Promise.reject('ERROR')
+    }
+    return Promise.resolve()
   }
 
   return {
@@ -321,7 +354,9 @@ const useApi = (baseURL:string, token:string) => {
     getWargaCabang,
     postWarga,
     postEvent,
-    getMajlisById
+    getMajlisById,
+    putNewAdminPassword,
+    putNewOfficePassword,
   }
 }
 

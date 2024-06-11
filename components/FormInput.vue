@@ -1,7 +1,8 @@
 <template>
   <div id="form-input">
     <label>{{ label }}</label>
-    <input type="text" :placeholder="placeholder" @input="$emit('update:modelValue', $event.target.value)" />
+    <input v-if="inputType === undefined || inputType === 'text'" type="text" :placeholder="placeholder" @input="$emit('update:modelValue', $event.target.value)" />
+    <input v-if="inputType === 'password'" type="password" :placeholder="placeholder" @input="$emit('update:modelValue', $event.target.value)" />
   </div>
 </template>
 <script>
@@ -9,7 +10,8 @@ export default {
   props: {
     label: String,
     placeholder: String,
-    modelValue: String
+    modelValue: String,
+    inputType: String
   }
 }
 </script>

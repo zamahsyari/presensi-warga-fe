@@ -49,6 +49,7 @@ const refreshData = async () => {
   } else {
     data.value = await api.getEvents(q.value, storage.getOfficeId())
   }
+  console.log('data', data.value)
   data.value.map(item => {
     const now = new Date()
     const nowDate = `${formatDecimal(now.getFullYear())}-${formatDecimal(now.getMonth() + 1)}-${formatDecimal(now.getDate())}`
@@ -110,11 +111,9 @@ onMounted(async () => {
 </template>
 <style lang="scss" scoped>
 #page{
-  background: #D0D0D0;
   height: 1vh;
   .topbar{
     width: 800px;
-    display: block;
     margin: auto;
     display: flex;
     align-items: center;
@@ -129,7 +128,7 @@ onMounted(async () => {
       font-weight: 700;
       font-size: 20px;
       line-height: 24px;
-      color: #000000;
+      color: #5e5e5e;
       margin: 0;
     }
   }
@@ -145,10 +144,11 @@ onMounted(async () => {
   h3{
     font-family: 'Inter';
     font-style: normal;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 16px;
     line-height: 19px;
     margin-top: 32px;
+    color: #5e5e5e;
   }
   ul{
     margin-left: -40px;

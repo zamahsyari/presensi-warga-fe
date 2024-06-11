@@ -1,12 +1,15 @@
 <template>
   <div id="navbar">
-    <img src="/logo.png" class="logo" />
+    <div class="logo">
+      <img src="/logo.png" />
+      <h2>Presensi</h2>
+    </div>
     <div class="spacer" />
-    <div class="user">
+    <div class="user" @click="toggleDropdown()">
       <div class="frame">
         <img src="~/assets/person_black.svg" />
       </div>
-      <b @click="toggleDropdown()">{{ user }}</b>
+      <b>{{ user }}</b>
       <ul v-if="showDropdown">
         <li @click="changePassword()">Ganti Password</li>
         <li @click="logout()">Keluar</li>
@@ -29,7 +32,8 @@ export default {
       this.showDropdown = !this.showDropdown
     },
     changePassword () {
-
+      const router = useRouter()
+      router.push('/change-password')
     },
     logout () {
       const storage = useStorage()
@@ -43,13 +47,29 @@ export default {
 <style lang="scss" scoped>
 #navbar{
   background: #00AA58;
-  padding: 16px 32px;
-  color: white;
+  background: white;
+  padding: 4px 32px;
+  color: #5e5e5e;
   display: flex;
   position: relative;
-  box-shadow: 0px 0px 5px #000000;
+  border-bottom: 1px solid #d1d1d1;
+  // box-shadow: 0px 0px 5px #000000;
   .logo{
     height: 32px;
+    padding: 8px;
+    display: flex;
+    gap: 16px;
+    img{
+      height: 100%;
+      display: inline-block;
+    }
+    h2{
+      color: #5e5e5e;
+      font-family: 'Inter';
+      font-weight: 600;
+      margin: 0;
+      display: inline-block;
+    }
   }
   .spacer{
     flex: 1;
@@ -63,6 +83,12 @@ export default {
     font-weight: 400;
     font-size: 14px;
     line-height: 17px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 8px;
+    &:hover{
+      background: #d1d1d1;
+    }
     .frame{
       height: 32px;
       width: 32px;
@@ -72,6 +98,7 @@ export default {
       align-items: center;
       justify-content: center;
       margin-right: 8px;
+      border: 1px solid #818181;
     }
     ul{
       cursor: pointer;
