@@ -103,12 +103,12 @@ const deletePresence = async (id:number) => {
     <div class="topbar">
       <h3>Daftar Kehadiran</h3>
       <div class="spacer" />
-      <img src="~/assets/plus.svg" @click="togglePopup" />
+      <img src="~/assets/plus.svg" />
       <a href="/add-guest">Tambah Mustamik</a>
     </div>
     <div class="search-bar">
-      <input type="text" placeholder="Cari nama warga" v-model="q" @keyup="searchWarga(q)" ref="searchInput" />
-      <img src="~/assets/search.svg" />
+      <input type="text" placeholder="Cari nama warga" v-model="q" @click="togglePopup()" @keyup="searchWarga(q)" ref="searchInput" />
+      <img src="~/assets/search.svg" @click="togglePopup()" />
     </div>
     <div class="content">
       <div class="section">
