@@ -27,6 +27,7 @@ const selectedGender = useState<string>('selected_gender', () => 'L')
 const name = useState('name', () => '')
 const phone = useState('phone', () => '')
 const address = useState('address', () => '')
+const isMustamik = useState('is_mustamik', () => 1)
 
 const setSelectedPerwakilan = async (e:any) => {
   selectedPerwakilan.value = e.target.value
@@ -72,7 +73,25 @@ onMounted(async () => {
     key: 'P',
     value: 'Perempuan'
   })
+  if (storage.getLevel() === 'PERWAKILAN') {
+    setSelectedPerwakilan({
+      target: {
+        value: storage.getOfficeId()
+      }
+    })
+  }
+  if (storage.getLevel() === 'CABANG') {
+    setSelectedCabang({
+      target: {
+        value: storage.getOfficeId()
+      }
+    })
+  }
 })
+
+const onChangeMustamik = (e:any) => {
+  isMustamik.value = parseInt(e.target.value)
+}
 
 const submit = async () => {
   let officeId = 0
@@ -89,7 +108,7 @@ const submit = async () => {
     member_gender: gender.value === 'L' ? 1 : 2,
     member_address: address.value,
     member_phone: phone.value,
-    member_mustamik: 1
+    member_mustamik: isMustamik.value
   })
 }
 </script>
@@ -106,8 +125,24 @@ const submit = async () => {
         <FormInput label="Alamat" placeholder="contoh: Jl Jalak 3" v-model="address" />
         <FormInput label="No Telp" placeholder="contoh: 0800000000" v-model="phone" />
         <FormSelect label="Pilih Jenis Kelamin" placeholder="--Pilih Jenis Kelamin--" :data="genderOptions" :on-change="(e) => setSelectedGender(e)" />
-        <FormSelect label="Pilih Perwakilan" placeholder="--Pilih Perwakilan--" :data="perwakilanOptions" :on-change="(e) => setSelectedPerwakilan(e)" />
-        <FormSelect label="Pilih Cabang" placeholder="--Pilih Cabang--" :data="cabangOptions" :on-change="(e) => setSelectedCabang(e)" />
+        <div v-if="storage.getFullname() === 'ADMIN'">
+          <FormSelect label="Pilih Perwakilan" placeholder="--Pilih Perwakilan--" :data="perwakilanOptions" :on-change="(e) => setSelectedPerwakilan(e)" />
+          <FormSelect label="Pilih Cabang" placeholder="--Pilih Cabang--" :data="cabangOptions" :on-change="(e) => setSelectedCabang(e)" />
+        </div>
+        <div v-if="storage.getLevel() === 'PERWAKILAN'">
+          <FormSelect label="Pilih Cabang" placeholder="--Pilih Cabang--" :data="cabangOptions" :on-change="(e) => setSelectedCabang(e)" />
+        </div>
+        <div class="form-input">
+          <label>Status Warga</label>
+          <div class="inline">
+            <input type="radio" value="0" name="is_mustamik" @change="onChangeMustamik">
+            Warga
+          </div>
+          <div class="inline">
+            <input type="radio" value="1" name="is_mustamik" @change="onChangeMustamik">
+            Mustamik
+          </div>
+        </div>
         <FormButton title="simpan" class="btn" @click="submit" />
       </form>
     </MainSection>
@@ -144,6 +179,32 @@ const submit = async () => {
     width: 800px;
     .btn{
       margin-top: 48px;
+    }
+    .form-input{
+      margin-top: 16px;
+      label{
+        display: block;
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 15px;
+        color: #525252;
+        margin-bottom: 8px;
+      }
+      .inline{
+        display: block;
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+      }
+      input{
+        display: inline-block;
+        padding: 16px;
+        border: 1px solid #D0D0D0;
+        border-radius: 4px;
+      }
     }
   }
 }

@@ -68,7 +68,9 @@ const setSelectedCabang = async (e:any) => {
 }
 
 const setSelectedGelombang = async (e:any) => {
-  selectedGelombang.value = e.target.value
+  if (e.target.value !== '') {
+    selectedGelombang.value = e.target.value 
+  }
 }
 
 const setSelectedInterval = async (e:any) => {
@@ -157,14 +159,14 @@ const submit = async () => {
 </script>
 <template>
   <div id="page">
-    <Navbar user="Administrator" />
+    <Navbar :user="storage.getFullname()" />
     <div class="topbar">
       <img src="~/assets/arrow_left.svg" @click="goBack()" class="back" />
       <h3>Tambah Acara</h3>
     </div>
     <MainSection class="main">
       <form>
-        <div v-if="storage.getLevel() === 'ADMIN'">
+        <div v-if="storage.getFullname() === 'ADMIN'">
           <FormSelect label="Pilih Perwakilan" placeholder="--Pilih Perwakilan--" :data="perwakilanOptions" :on-change="(e) => setSelectedPerwakilan(e)" />
           <FormSelect label="Pilih Cabang" placeholder="--Pilih Cabang--" :data="cabangOptions" :on-change="(e) => setSelectedCabang(e)" />
         </div>
@@ -176,7 +178,7 @@ const submit = async () => {
         <FormTextarea label="Deskripsi Acara" placeholder="contoh: Kajian rutin tiap sabtu sore" v-model="description" />
         <FormDateTime label="Waktu Mulai" placeholderDate="yyyy-mm-dd" placeholderTime="hh:mm" v-model="startAt" />
         <FormDateTime label="Waktu Selesai" placeholderDate="yyyy-mm-dd" placeholderTime="hh:mm" v-model="endAt" />
-        <FormSelect label="Pilih Interval" placeholder="--Pilih Interval--" :data="intervalOptions" :on-change="(e) => setSelectedInterval(e)" />
+        <!-- <FormSelect label="Pilih Interval" placeholder="--Pilih Interval--" :data="intervalOptions" :on-change="(e) => setSelectedInterval(e)" /> -->
         <FormButton title="simpan" class="btn" @click="submit" />
       </form>
     </MainSection>

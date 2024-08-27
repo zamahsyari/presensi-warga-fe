@@ -184,17 +184,18 @@ const useApi = (baseURL:string, token:string) => {
   const getEvents = async (q:string, officeId:number):Promise<Acara[]> => {
     const maxInt = Number.MAX_SAFE_INTEGER
     let url = ''
-    if (officeId != 0) {
+    if (officeId === 0) {
       url = `${baseURL}/events?per_page=${maxInt}&page=1&filter=name:${q}`
     } else {
       url = `${baseURL}/events?per_page=${maxInt}&page=1&filter=name:${q},office_id:${officeId}`
     }
     const now = new Date()
-    const dateNow = `${formatDecimal(now.getFullYear())}-${formatDecimal(now.getMonth() + 1)}-${formatDecimal(now.getDate())}`
-    const nextWeek = new Date()
-    nextWeek.setDate(now.getDate() + 7)
-    const dateNextWeek = `${formatDecimal(nextWeek.getFullYear())}-${formatDecimal(nextWeek.getMonth() + 1)}-${formatDecimal(nextWeek.getDate())}`
-    url = `${url},from:${dateNow},to:${dateNextWeek},name:${q}&sort=updated_at:-1`
+    // const dateNow = `${formatDecimal(now.getFullYear())}-${formatDecimal(now.getMonth() + 1)}-${formatDecimal(now.getDate())}`
+    // const nextWeek = new Date()
+    // nextWeek.setDate(now.getDate() + 7)
+    // const dateNextWeek = `${formatDecimal(nextWeek.getFullYear())}-${formatDecimal(nextWeek.getMonth() + 1)}-${formatDecimal(nextWeek.getDate())}`
+    // url = `${url},from:${dateNow},to:${dateNextWeek},name:${q}&sort=updated_at:-1`
+    url = `${url},name:${q}&sort=updated_at:-1`
     const {data, status} = await axios.get<GetEventResponse>(url, {
       headers: {
         'Authorization': `Bearer ${token}`

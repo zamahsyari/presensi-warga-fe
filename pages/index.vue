@@ -22,7 +22,7 @@ const doLogin = async ():Promise<boolean> => {
     const response = await api.postLogin(username.value, password.value)
     storage.setToken(response.token)
     storage.setOfficeId(response.office_id)
-    storage.setName(response.name)
+    storage.setFullname(response.name)
     storage.setUsername(response.username)
     storage.setUserId(response.id)
     api = useApi(config.public.API_BASE_URL, storage.getToken())

@@ -6,7 +6,7 @@ const useStorage = () => {
   const officeId = useState('officeId', () => 0)
   const userId = useState('userId', () => 0)
   const username = useState('username', () => '')
-  const name = useState('name', () => '')
+  const fullname = useState('fullname', () => '')
   const level = useState('level', () => '')
   const office = useState<Majlis|null>('office', () => null)
 
@@ -80,17 +80,17 @@ const useStorage = () => {
     }
   }
 
-  const setName = (val:string) => {
-    name.value = val
-    useCookie('name').value = val
+  const setFullname = (val:string) => {
+    fullname.value = val
+    useCookie('fullname').value = val
   }
 
-  const getName = () => {
-    if (name.value === '') {
+  const getFullname = () => {
+    if (fullname.value === '') {
       const cookie = useCookie('name')
       return cookie.value
     } else {
-      return name.value
+      return fullname.value
     }
   }
 
@@ -125,8 +125,8 @@ const useStorage = () => {
     getUsername,
     setLevel,
     getLevel,
-    setName,
-    getName,
+    setFullname,
+    getFullname,
     setUserId,
     getUserId,
     setError,

@@ -9,6 +9,7 @@ const api = useApi(config.public.API_BASE_URL, storage.getToken())
 const data = useState<Acara[]>('data', () => [])
 const todays = useState<Acara[]>('today', () => [])
 const others = useState<Acara[]>('others', () => [])
+const pastDays = useState<Acara[]>('pastDays', () => [])
 
 const q = useState('q', () => '')
 
@@ -44,6 +45,7 @@ const refreshData = async () => {
   console.log('refreshData...')
   todays.value = []
   others.value = []
+  pastDays.value = []
   if (storage.getLevel() === 'ADMIN') {
     data.value = await api.getEvents(q.value, 0)
   } else {
@@ -55,7 +57,9 @@ const refreshData = async () => {
     const nowDate = `${formatDecimal(now.getFullYear())}-${formatDecimal(now.getMonth() + 1)}-${formatDecimal(now.getDate())}`
     const itemStart = new Date(item.start_at)
     const itemDate = `${formatDecimal(itemStart.getFullYear())}-${formatDecimal(itemStart.getMonth() + 1)}-${formatDecimal(itemStart.getDate())}`
-    if (nowDate === itemDate) {
+    if (nowDate > itemDate) {
+      pastDays.value.push(item)
+    } else if (nowDate === itemDate) {
       todays.value.push(item)
     }else{
       others.value.push(item)
@@ -80,7 +84,7 @@ onMounted(async () => {
 </script>
 <template>
   <div id="page">
-    <Navbar :user="storage.getUsername()" />
+    <Navbar :user="storage.getFullname()" />
     <div class="topbar">
       <h3>Pilih Acara</h3>
       <div class="spacer" />
@@ -89,6 +93,14 @@ onMounted(async () => {
     <MainSection class="main">
       <Searchbar label="Cari nama acara/kajian/gelombang..." v-model="q" @keyup="(e) => onKeyup(e)" />
       <div class="content">
+        <div class="section">
+          <h3>Sudah lewat</h3>
+          <ul>
+            <li v-for="item in pastDays" :key="item.id" @click="gotoNext(item.id)">
+              <ListItem image="/_nuxt/assets/book.svg" :title="item.name" :caption="formatTimeRangeNow(new Date(item.start_at), new Date(item.end_at))" />
+            </li>
+          </ul>
+        </div>
         <div class="section">
           <h3>Hari Ini</h3>
           <ul>

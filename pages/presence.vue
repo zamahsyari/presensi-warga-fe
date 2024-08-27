@@ -7,8 +7,8 @@ const togglePopup = () => {
 }
 
 const showAbsence = useState('showAbsence', () => false)
-const toggleAbsence = () => {
-  showAbsence.value = !showAbsence.value
+const toggleAbsence = (item:WargaItem) => {
+  item.show_others = !item.show_others
 }
 
 const router = useRouter()
@@ -19,7 +19,7 @@ const api = useApi(config.public.API_BASE_URL, storage.getToken())
 
 const presences = useState<Presence[]>('presences', () => [])
 const acara = useState<Acara|null>('event', () => null)
-const warga = useState<Warga[]>('warga', () => [])
+const warga = useState<WargaItem[]>('warga', () => [])
 
 const officeId = useState('officeId', () => 0)
 const q = useState('q', () => '')
@@ -33,30 +33,81 @@ onMounted(async () => {
   presences.value = await api.getPresences(eventId)
   acara.value = await api.getEventById(eventId)
   officeId.value = acara.value.office_id
-  warga.value = await api.getWargaCabang(officeId.value)
+  const allwarga = await api.getWargaCabang(officeId.value)
+  for(let i=0;allwarga.length; i++){
+    warga.value.push({
+      member_id: allwarga[i].member_id,
+      office_id: allwarga[i].office_id,
+      delegation_id: allwarga[i].delegation_id,
+      member_name: allwarga[i].member_name,
+      member_gender: allwarga[i].member_gender,
+      member_address: allwarga[i].member_address,
+      member_phone: allwarga[i].member_phone,
+      member_mustamik: allwarga[i].member_mustamik,
+      show_others: false
+    })
+  }
 })
 
 const searchWarga = async (q:string) => {
   if(q.length < 1 || q.length > 3){
-    warga.value = await api.getWargaCabang(officeId.value, q)
+    const allwarga = await api.getWargaCabang(officeId.value, q)
+    for(let i=0;allwarga.length; i++){
+    warga.value.push({
+      member_id: allwarga[i].member_id,
+      office_id: allwarga[i].office_id,
+      delegation_id: allwarga[i].delegation_id,
+      member_name: allwarga[i].member_name,
+      member_gender: allwarga[i].member_gender,
+      member_address: allwarga[i].member_address,
+      member_phone: allwarga[i].member_phone,
+      member_mustamik: allwarga[i].member_mustamik,
+      show_others: false
+    })
+  }
   }
 }
 
-const submitHadir = async (memberId:number) => {
+const submitHadir = async (warga:WargaItem, permitType:number) => {
   const eventId:number = route.query.eventId !== null ? parseInt(route.query.eventId.toString()) : 0
-  await api.postPresence({
-    member_id: memberId,
-    event_id: eventId,
-    permit_type: 0,
-    note: '',
-  })
+  try{
+    await api.postPresence({
+      member_id: warga.member_id,
+      event_id: eventId,
+      permit_type: permitType,
+      note: note.value,
+    })
+  }catch(e:any){
+    console.log(e.response.data)
+  }
   presences.value = await api.getPresences(eventId)
+  if (permitType > 0) {
+    toggleAbsence(warga)
+  }
 }
 
 const deletePresence = async (id:number) => {
   const eventId:number = route.query.eventId !== null ? parseInt(route.query.eventId.toString()) : 0
   await api.deletePresence(id)
   presences.value = await api.getPresences(eventId)
+}
+
+const gotoPrev = async () => {
+  router.push({
+    path: "/dashboard"
+  })
+}
+
+export type WargaItem = {
+  member_id: number
+  office_id: number
+  delegation_id: number
+  member_name: string
+  member_gender: number
+  member_address: string
+  member_phone: string
+  member_mustamik: number
+  show_others: boolean
 }
 
 </script>
@@ -80,15 +131,15 @@ const deletePresence = async (id:number) => {
                   <b>{{ item.member_name }}</b>
                 </div>
                 <div class="spacer" />
-                <button @click="submitHadir(item.member_id)">hadir</button>
-                <button @click="toggleAbsence()">tidak hadir</button>
-                <div class="absence" v-if="showAbsence">
+                <button @click="submitHadir(item, 0)">hadir</button>
+                <button @click="toggleAbsence(item)">tidak hadir</button>
+                <div class="absence" v-if="item.show_others">
                   <ul>
                     <li>
-                      <button>sakit</button>
-                      <button>kerja</button>
-                      <button>pulang kampung</button>
-                      <button>lain-lain</button>
+                      <button @click="submitHadir(item, 1)">sakit</button>
+                      <button @click="submitHadir(item, 2)">kerja</button>
+                      <button @click="submitHadir(item, 3)">pulang kampung</button>
+                      <button @click="submitHadir(item, 4)">lain-lain</button>
                     </li>
                     <input type="text" v-model="note" placeholder="Keterangan" />
                   </ul>
@@ -101,6 +152,7 @@ const deletePresence = async (id:number) => {
     </Transition>
     <div class="bg-top" />
     <div class="topbar">
+      <img src="~/assets/arrow_left.svg" class="back-btn" @click="gotoPrev" />
       <h3>Daftar Kehadiran</h3>
       <div class="spacer" />
       <img src="~/assets/plus.svg" />
@@ -275,6 +327,19 @@ const deletePresence = async (id:number) => {
             margin-right: 0;
           }
         }
+        .absence{
+          position: absolute;
+          ul{
+            padding: 20px;
+            background: white;
+            border: 1px solid #525252;
+            position: relative;
+            li{
+              margin-left: 0px;
+              display: block;
+            }
+          }
+        }
       }
     }
   }
@@ -295,6 +360,9 @@ const deletePresence = async (id:number) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  .back-btn{
+    margin-right: 16px;
+  }
   a{
     text-decoration: none;
     color: white;

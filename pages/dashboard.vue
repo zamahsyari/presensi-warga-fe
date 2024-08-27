@@ -63,6 +63,12 @@ const gotoAdd = () => {
     }
   })
 }
+
+const gotoPrev = async () => {
+  router.push({
+    path: "/event"
+  })
+}
 onMounted(async () => {
   const eventId:string = route.query.eventId as string
   acara.value = await api.getEventById(parseInt(eventId))
@@ -108,7 +114,7 @@ const roundNumber = (val:number) => {
     <div id="dashboard">
       <div class="container">
         <div class="navbar">
-          <img src="~/assets/arrow_left.svg" class="back-btn" />
+          <img src="~/assets/arrow_left.svg" class="back-btn" @click="gotoPrev" />
           <h3>Dashboard {{ acara?.name }}</h3>
           <div class="spacer" />
           <button @click="gotoAdd()">
@@ -119,7 +125,7 @@ const roundNumber = (val:number) => {
             <div class="frame">
               <img src="~/assets/person_black.svg" />
             </div>
-            <b>Administrator</b>
+            <b>{{storage.getFullname()}}</b>
           </div>
         </div>
         <div class="recap">
