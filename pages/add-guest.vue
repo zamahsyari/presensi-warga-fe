@@ -108,7 +108,7 @@ const submit = async () => {
     member_gender: gender.value === 'L' ? 1 : 2,
     member_address: address.value,
     member_phone: phone.value,
-    member_mustamik: isMustamik.value
+    member_mustamik: 1
   })
 }
 </script>
@@ -132,7 +132,7 @@ const submit = async () => {
         <div v-if="storage.getLevel() === 'PERWAKILAN'">
           <FormSelect label="Pilih Cabang" placeholder="--Pilih Cabang--" :data="cabangOptions" :on-change="(e) => setSelectedCabang(e)" />
         </div>
-        <div class="form-input">
+        <!-- <div class="form-input">
           <label>Status Warga</label>
           <div class="inline">
             <input type="radio" value="0" name="is_mustamik" @change="onChangeMustamik">
@@ -142,7 +142,7 @@ const submit = async () => {
             <input type="radio" value="1" name="is_mustamik" @change="onChangeMustamik">
             Mustamik
           </div>
-        </div>
+        </div> -->
         <FormButton title="simpan" class="btn" @click="submit" />
       </form>
     </MainSection>
